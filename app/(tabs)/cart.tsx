@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function ProductsScreen() {
+export default function CartScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home screen</Text>
-      <Text style={styles.subtext}>Build your product catalog here</Text>
+      <Text style={styles.text}>Shopping Cart</Text>
+      <Text style={styles.subtext}>Build your cart functionality here</Text>
     </View>
   );
 }

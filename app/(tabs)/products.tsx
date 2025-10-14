@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function ProductsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home screen</Text>
+      <Text style={styles.text}>Products Screen</Text>
       <Text style={styles.subtext}>Build your product catalog here</Text>
     </View>
   );
