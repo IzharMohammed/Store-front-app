@@ -39,7 +39,6 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(auth)" options={{ title: "Auth" }} />
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="index" options={{ title: "Home" }} />
     </Stack>
   );
 }

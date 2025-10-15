@@ -24,7 +24,6 @@ export async function getProducts(filters: Record<string, any> = {}): Promise<Pr
         });
 
         const data = await response.json();
-        console.log("data", data);
 
         if (!response.ok) {
             return { success: false, error: data.message || "Failed to fetch products" };

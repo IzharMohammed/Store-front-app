@@ -69,13 +69,12 @@ export default function SignUpScreen() {
         email,
         password,
       });
-      console.log("result", result);
 
       if (result.success) {
         Alert.alert("Success!", "Your account has been created successfully", [
           {
             text: "Continue",
-            onPress: () => router.replace("/(tabs)"),
+            onPress: () => router.replace("/(auth)/signin"),
           },
         ]);
       }

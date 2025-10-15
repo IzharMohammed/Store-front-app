@@ -137,7 +137,7 @@ export default function ProductsScreen() {
             style={styles.categoryTag}
             onPress={() =>
               router.push({
-                pathname: "/(tabs)/products",
+                pathname: "/category/[category]",
                 params: { category: item.name },
               })
             }
