@@ -5,7 +5,8 @@ interface ApiConfig {
     endpoints: {
         signin: string;
         signup: string;
-        banner: string;
+        banners: string;
+        products: string;
     };
 }
 
@@ -15,6 +16,7 @@ export const API_CONFIG: ApiConfig = {
     endpoints: {
         signin: '/v1/signin',
         signup: '/v1/signup',
-        banner: '/v1/banners'
+        banners: '/v1/banners',
+        products: '/v1/products'
     }
 }

@@ -1,11 +1,15 @@
 import { getBanners } from "@/actions/banner";
+import { getProducts } from "@/actions/product";
 import { BannerItem } from "@/types/banner";
+import { Product } from "@/types/product";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  Image,
   ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,29 +17,41 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
+const ITEM_WIDTH = (width - 40) / 2;
 
 export default function ProductsScreen() {
   const [banners, setBanners] = useState<BannerItem[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchBanners = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await getBanners();
-        if (response.data?.success && response.data.data) {
-          setBanners(response.data.data);
+        const [bannerRes, productRes] = await Promise.all([
+          getBanners(),
+          getProducts({ limit: 8 }),
+        ]);
+
+        if (bannerRes.data?.success && bannerRes.data.data) {
+          setBanners(bannerRes.data.data);
         } else {
-          console.error("Failed to load Banners!");
+          console.error("Failed to load banners!");
+        }
+
+        if (productRes.success && productRes.data) {
+          setProducts(productRes.data);
+        } else {
+          console.error("Failed to load products!");
         }
       } catch (error) {
-        console.error("Failed to load banners:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBanners();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -66,16 +82,51 @@ export default function ProductsScreen() {
     </TouchableOpacity>
   );
 
+  const renderProduct = ({ item }: { item: Product }) => (
+    <TouchableOpacity style={styles.card}>
+      <View style={styles.imageWrapper}>
+        <Image source={{ uri: item.image![0] }} style={styles.productImage} />
+        {item.discount ? (
+          <View style={[styles.tag, { backgroundColor: "#000" }]}>
+            <Text style={styles.tagText}>Sale</Text>
+          </View>
+        ) : (
+          <View style={[styles.tag, { backgroundColor: "#000" }]}>
+            <Text style={styles.tagText}>New</Text>
+          </View>
+        )}
+      </View>
+      <Text numberOfLines={1} style={styles.name}>
+        {item.name}
+      </Text>
+      <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      {/* --- Banner Section --- */}
       <FlatList
         data={banners}
         keyExtractor={(item) => item.id}
         renderItem={renderBanner}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        scrollEnabled={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
-    </View>
+
+      {/* --- Product Section --- */}
+      <Text style={styles.sectionTitle}>Featured Products</Text>
+      <FlatList
+        data={products}
+        numColumns={2}
+        keyExtractor={(item) => item.id}
+        scrollEnabled={false}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        renderItem={renderProduct}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+      />
+    </ScrollView>
   );
 }
 
@@ -86,14 +137,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingTop: 10,
   },
-  // banner: {
-  //   width: width - 32,
-  //   height: height * 0.3,
-  //   marginHorizontal: 16,
-  //   marginBottom: 20,
-  //   justifyContent: "flex-end",
-  //   overflow: "hidden",
-  // },
   banner: {
     width: "100%",
     height: 310,
@@ -124,6 +167,53 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#000",
     fontWeight: "600",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  card: {
+    width: ITEM_WIDTH,
+    backgroundColor: "#fff",
+    marginBottom: 16,
+  },
+  imageWrapper: {
+    // position: "relative",
+    width: "100%",
+    height: ITEM_WIDTH * 1.3,
+    backgroundColor: "#f5f5f5",
+  },
+  productImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  tag: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    borderRadius: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  name: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#000",
+    marginTop: 6,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#000",
+    marginTop: 4,
   },
   loader: {
     flex: 1,
