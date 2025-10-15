@@ -1,11 +1,24 @@
 import { API_CONFIG } from "@/constants/config";
+import { CartResponse } from "@/types/cart";
+import { storage } from "@/utils/storage";
 
 const headers = {
     "Content-Type": "application/json",
     "x-api-key": process.env.BACKEND_API_KEY || "",
 };
 
-export async function getCartItems() {
+export async function buildHeaders() {
+    const user = await storage.getUserData();
+
+    return {
+        "Content-Type": "application/json",
+        "x-api-key": API_CONFIG.apiKey || "",
+        ...(user?.id ? { "x-customer-id": user.id } : {})
+    }
+}
+
+export async function getCartItems(): Promise<CartResponse> {
+    const headers = await buildHeaders();
     try {
         const response = await fetch(
             `${API_CONFIG.baseURL}${API_CONFIG.endpoints.carts}`, {
@@ -19,18 +32,18 @@ export async function getCartItems() {
             console.log(`Error ${response.status}: ${errorText}`);
         }
 
-        const data = response.json();
+        const data = await response.json() as CartResponse;
+        console.log("cart data", data);
+        return data
 
-        return {
-            data
-        }
     } catch (error) {
         console.error("Error fetching cart:", error);
         throw error;
     }
 }
 
-export async function addToCart({ productId, quantity }: { productId: string, quantity: string }) {
+export async function addToCart({ productId, quantity }: { productId: string, quantity: number }): Promise<{ success: boolean, message: string }> {
+    const headers = await buildHeaders();
 
     if (!productId || !quantity) {
         return {
@@ -48,6 +61,7 @@ export async function addToCart({ productId, quantity }: { productId: string, qu
             body: JSON.stringify({ productId, quantity }),
         }
         );
+        console.log("response", response);
 
         if (!response.ok) {
             const errorData = await response.json();
