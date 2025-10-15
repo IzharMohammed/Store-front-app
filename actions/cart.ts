@@ -2,11 +2,6 @@ import { API_CONFIG } from "@/constants/config";
 import { CartResponse } from "@/types/cart";
 import { storage } from "@/utils/storage";
 
-const headers = {
-    "Content-Type": "application/json",
-    "x-api-key": process.env.BACKEND_API_KEY || "",
-};
-
 export async function buildHeaders() {
     const user = await storage.getUserData();
 
@@ -79,12 +74,14 @@ export async function addToCart({ productId, quantity }: { productId: string, qu
 }
 
 export async function removeFromCart(cartId: string) {
+    const headers = await buildHeaders();
     try {
-        const response = await fetch(` ${API_CONFIG.baseURL}${API_CONFIG.endpoints.carts}`, {
+        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.carts}`, {
             method: "DELETE",
             headers,
             body: JSON.stringify({ cartId }),
         });
+        console.log("delete response", response);
 
         if (!response.ok) {
             const errorData = await response.json();
@@ -98,6 +95,7 @@ export async function removeFromCart(cartId: string) {
 }
 
 export async function updateCartQuantity({ cartId, newQuantity }: { cartId: string, newQuantity: number }) {
+    const headers = await buildHeaders();
     try {
         const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.carts}/update`, {
             method: "PATCH",
@@ -108,6 +106,7 @@ export async function updateCartQuantity({ cartId, newQuantity }: { cartId: stri
                 quantity: newQuantity,
             }),
         });
+        console.log("update response", response);
 
         if (!response.ok) {
             const errorData = await response.json();

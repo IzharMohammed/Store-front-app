@@ -1,8 +1,14 @@
-import { getCartItems } from "@/actions/cart";
+import {
+  getCartItems,
+  removeFromCart,
+  updateCartQuantity,
+} from "@/actions/cart";
 import { CartItem } from "@/types/cart";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -14,14 +20,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CartScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchCartData = async () => {
+  const fetchCartData = async () => {
+    setLoading(true);
+    try {
       const response = await getCartItems();
       setCartItems(response.data);
-    };
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    } finally {
+      setLoading(true);
+    }
+  };
 
+  useEffect(() => {
     fetchCartData();
   }, []);
 
@@ -46,14 +61,63 @@ export default function CartScreen() {
     });
   }, [navigation]);
 
+  const handleIncrease = async (cartId: string, quantity: number) => {
+    const newQuantity = quantity + 1;
+    await updateCartQuantity({ cartId, newQuantity });
+    fetchCartData();
+  };
+
+  const handleDecrease = async (cartId: string, quantity: number) => {
+    if (quantity <= 1) return;
+    const newQuantity = quantity - 1;
+    await updateCartQuantity({ cartId, newQuantity });
+    fetchCartData();
+  };
+
+  const handleDelete = async (cartId: string) => {
+    Alert.alert("Remove Item", "Are ou sure you want to remove this item?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: async () => {
+          await removeFromCart(cartId);
+          fetchCartData();
+        },
+      },
+    ]);
+  };
+
   const renderItem = ({ item }: { item: CartItem }) => (
     <View style={styles.card}>
       <Image source={{ uri: item.product.image[0] }} style={styles.image} />
+
       <View style={styles.info}>
         <Text style={styles.name}>{item.product.name}</Text>
         <Text style={styles.price}>${item.product.price}</Text>
-        <View style={styles.quantityContainer}>
-          <Text style={styles.qtyText}>Qty: {item.quantity}</Text>
+
+        <View style={styles.actionsRow}>
+          <View style={styles.quantityControls}>
+            <TouchableOpacity
+              onPress={() => handleDecrease(item.id, item.quantity)}
+              style={styles.qtyButton}
+            >
+              <Ionicons name="remove" size={18} color="#333" />
+            </TouchableOpacity>
+
+            <Text style={styles.qtyValue}>{item.quantity}</Text>
+
+            <TouchableOpacity
+              onPress={() => handleIncrease(item.id, item.quantity)}
+              style={styles.qtyButton}
+            >
+              <Ionicons name="add" size={18} color="#333" />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity onPress={() => handleDelete(item.id)}>
+            <Ionicons name="trash-outline" size={22} color="#FF3B30" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -106,6 +170,30 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: "#eee",
     padding: 16,
+  },
+  actionsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 6,
+  },
+  quantityControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e9ecef",
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+  },
+  qtyButton: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  qtyValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginHorizontal: 8,
+    color: "#333",
   },
   row: {
     flexDirection: "row",
