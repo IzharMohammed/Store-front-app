@@ -21,7 +21,7 @@ export default function RootLayout() {
       // User is not authenticated and trying to access protected route
       router.replace("/signin");
     } else if (isAuthenticated && inAuthGroup) {
-      router.replace("/");
+      router.replace("/(tabs)/home");
     }
   }, [isAuthenticated, segments]);
 
