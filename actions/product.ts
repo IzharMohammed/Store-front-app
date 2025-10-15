@@ -1,5 +1,5 @@
 import { API_CONFIG } from "@/constants/config";
-import { ProductResponse } from "@/types/product";
+import { ProductDetailResponse, ProductResponse } from "@/types/product";
 
 const headers = {
     "Content-Type": "application/json",
@@ -33,5 +33,39 @@ export async function getProducts(filters: Record<string, any> = {}): Promise<Pr
     } catch (error) {
         console.error("Error fetching products:", error);
         return { success: false, error: "Network error" };
+    }
+}
+
+export async function getProductById(productId: string): Promise<ProductDetailResponse> {
+    try {
+        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.products}/${productId}`, {
+            method: "GET",
+            headers,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+                success: false,
+                error:
+                    errorData.message ||
+                    `Server error: ${response.status}. Please try again.`,
+            };
+        }
+
+        const data = await response.json();
+        console.log("data", data);
+
+        return {
+            success: true,
+            data,
+        };
+    } catch (error) {
+        console.error("Error fetching product details:", error);
+        return {
+            success: false,
+            error:
+                error instanceof Error ? error.message : "Failed to fetch product details",
+        };
     }
 }

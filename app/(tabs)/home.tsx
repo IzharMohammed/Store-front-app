@@ -93,7 +93,15 @@ export default function ProductsScreen() {
   );
 
   const renderProduct = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() =>
+        router.push({
+          pathname: "/product/[id]",
+          params: { id: item.id },
+        })
+      }
+    >
       <View style={styles.imageWrapper}>
         <Image source={{ uri: item.image![0] }} style={styles.productImage} />
         {item.discount ? (
