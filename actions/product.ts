@@ -53,12 +53,13 @@ export async function getProductById(productId: string): Promise<ProductDetailRe
             };
         }
 
-        const data = await response.json();
+        const data = await response.json() as ProductDetailResponse;
         console.log("data", data);
 
         return {
             success: true,
-            data,
+            data: data.data,
+            message: data.message
         };
     } catch (error) {
         console.error("Error fetching product details:", error);
