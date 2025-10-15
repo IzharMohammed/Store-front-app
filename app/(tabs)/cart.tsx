@@ -5,8 +5,8 @@ import {
 } from "@/actions/cart";
 import { CartItem } from "@/types/cart";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -21,6 +21,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function CartScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const navigation = useNavigation();
 
@@ -36,9 +37,11 @@ export default function CartScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchCartData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCartData();
+    }, [])
+  );
 
   console.log("cartItems", cartItems);
 
@@ -123,12 +126,20 @@ export default function CartScreen() {
     </View>
   );
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchCartData();
+    setRefreshing(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={cartItems}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         contentContainerStyle={styles.list}
       />
 
