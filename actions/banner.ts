@@ -9,7 +9,7 @@ export async function getBanners(): Promise<BannerResponse> {
         }
 
         const response = await fetch(
-            `${API_CONFIG.baseURL}${API_CONFIG.endpoints.banner}`, {
+            `${API_CONFIG.baseURL}${API_CONFIG.endpoints.banners}`, {
             method: "GET",
             headers,
         }
