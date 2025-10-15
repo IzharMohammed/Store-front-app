@@ -2,7 +2,7 @@ import { storage } from "@/utils/storage";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 
-export default function RootLayout() {
+function RouteGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const segments = useSegments();
   const router = useRouter();
@@ -34,11 +34,16 @@ export default function RootLayout() {
   if (isAuthenticated === null) {
     return null;
   }
+  return <>{children}</>;
+}
 
+export default function RootLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" options={{ title: "Auth" }} />
-      <Stack.Screen name="(tabs)" />
-    </Stack>
+    <RouteGuard>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" options={{ title: "Auth" }} />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </RouteGuard>
   );
 }
