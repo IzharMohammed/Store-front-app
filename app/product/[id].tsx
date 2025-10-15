@@ -1,4 +1,5 @@
 import { getProductById, getProducts } from "@/actions/product";
+import AddToCartButton from "@/components/cart-button";
 import { ProductImageCarousel } from "@/components/image-carousel";
 import { Product } from "@/types/product";
 import { Ionicons } from "@expo/vector-icons";
@@ -110,7 +111,10 @@ export default function ProductDetailPage() {
           <Text style={styles.totalPrice}>${product.price}</Text>
         </View>
         <TouchableOpacity style={styles.cartButton}>
-          <Text style={styles.cartText}>+ Add to cart</Text>
+          {/* <Text onPress={()=>handleAddToCart()} style={styles.cartText}>
+            + Add to cart
+          </Text> */}
+          <AddToCartButton productId={product.id} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
