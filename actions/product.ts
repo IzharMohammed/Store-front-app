@@ -1,12 +1,13 @@
 import { API_CONFIG } from "@/constants/config";
 import { ProductResponse } from "@/types/product";
 
+const headers = {
+    "Content-Type": "application/json",
+    "x-api-key": API_CONFIG.apiKey,
+};
+
 export async function getProducts(filters: Record<string, any> = {}): Promise<ProductResponse> {
     try {
-        const headers = {
-            "Content-Type": "application/json",
-            "x-api-key": API_CONFIG.apiKey,
-        };
         const queryParams = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
             if (value !== undefined && value !== null && value !== "") {
@@ -23,6 +24,7 @@ export async function getProducts(filters: Record<string, any> = {}): Promise<Pr
         });
 
         const data = await response.json();
+        console.log("data", data);
 
         if (!response.ok) {
             return { success: false, error: data.message || "Failed to fetch products" };
