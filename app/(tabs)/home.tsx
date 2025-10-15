@@ -1,7 +1,9 @@
 import { getBanners } from "@/actions/banner";
 import { getProducts } from "@/actions/product";
 import { BannerItem } from "@/types/banner";
+import { Category } from "@/types/category";
 import { Product } from "@/types/product";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -23,6 +25,8 @@ export default function ProductsScreen() {
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +47,12 @@ export default function ProductsScreen() {
           setProducts(productRes.data);
         } else {
           console.error("Failed to load products!");
+        }
+
+        if (productRes.filters?.categories) {
+          setCategories(productRes.filters.categories);
+        } else {
+          console.error("Failed to load categories!");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -115,6 +125,27 @@ export default function ProductsScreen() {
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
+      {/* --- Category Tags --- */}
+      <FlatList
+        data={categories}
+        keyExtractor={(item) => item.name}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoryContainer}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.categoryTag}
+            onPress={() =>
+              router.push({
+                pathname: "/(tabs)/products",
+                params: { category: item.name },
+              })
+            }
+          >
+            <Text style={styles.categoryText}>{item.name}</Text>
+          </TouchableOpacity>
+        )}
+      />
       {/* --- Product Section --- */}
       <Text style={styles.sectionTitle}>Featured Products</Text>
       <FlatList
@@ -213,6 +244,21 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#000",
     marginTop: 4,
+  },
+  categoryContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  categoryTag: {
+    backgroundColor: "#f2f2f2",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 8,
+  },
+  categoryText: {
+    color: "#000",
+    fontWeight: "500",
   },
   loader: {
     flex: 1,
