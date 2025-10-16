@@ -1,5 +1,5 @@
-import AddToCartButton from "@/components/cart-button";
-import WishlistButton from "@/components/wishlist-button";
+import AddToCartButton from "@/components/cart/cart-button";
+import WishlistButton from "@/components/wishlist/wishlist-button";
 import { WishlistItem } from "@/types/wishlist";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";

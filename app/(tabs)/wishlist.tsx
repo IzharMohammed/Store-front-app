@@ -1,5 +1,5 @@
 import { getWishlistItems } from "@/actions/wishlist";
-import { WishlistItemCard } from "@/components/wishlist-item-card";
+import { WishlistItemCard } from "@/components/wishlist/wishlist-item-card";
 import { WishlistItem } from "@/types/wishlist";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";

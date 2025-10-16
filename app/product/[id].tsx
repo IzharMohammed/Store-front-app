@@ -1,8 +1,8 @@
 import { getProductById, getProducts } from "@/actions/product";
 import { getWishlistItems } from "@/actions/wishlist";
-import AddToCartButton from "@/components/cart-button";
+import AddToCartButton from "@/components/cart/cart-button";
 import { ProductImageCarousel } from "@/components/image-carousel";
-import WishlistButton from "@/components/wishlist-button";
+import WishlistButton from "@/components/wishlist/wishlist-button";
 import { Product } from "@/types/product";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
