@@ -29,11 +29,11 @@ export default function AddToCartButton({
     setIsPending(false);
     if (retryResult.success) {
       setIsSuccess(true);
-      // Alert.alert("Item added to cart!");
-      Toast.show({
-        type: "success",
-        text1: "Added to cart 🛒",
-      });
+      Alert.alert("Item added to cart!");
+      // Toast.show({
+      //   type: "success",
+      //   text1: "Added to cart 🛒",
+      // });
 
       setTimeout(() => setIsSuccess(false), 3000);
     } else {
