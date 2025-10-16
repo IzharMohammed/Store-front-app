@@ -10,6 +10,7 @@ export async function buildHeaders() {
         ...(user?.id ? { "x-customer-id": user.id } : {})
     }
 }
+
 export async function getOrders() {
     const headers = await buildHeaders();
     try {
