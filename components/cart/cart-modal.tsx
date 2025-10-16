@@ -1,7 +1,12 @@
-// components/CartAddedModal.tsx
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export default function CartAddedModal({
   visible,
@@ -14,6 +19,17 @@ export default function CartAddedModal({
   onCheckout: () => void;
   product?: { name: string; price: number; image?: string };
 }) {
+  const translateY = useSharedValue(0);
+
+  React.useEffect(() => {
+    // Slide up when visible
+    if (visible) translateY.value = withTiming(0, { duration: 300 });
+  }, [visible]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
   return (
     <Modal
       isVisible={visible}
@@ -23,7 +39,7 @@ export default function CartAddedModal({
       backdropTransitionOutTiming={0}
       style={styles.modal}
     >
-      <View style={styles.sheet}>
+      <Animated.View style={[styles.sheet, animatedStyle]}>
         <View style={styles.handle} />
         <Text style={styles.title}>Added to cart</Text>
 
@@ -38,15 +54,29 @@ export default function CartAddedModal({
         )}
 
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.outlineButton} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.outlineButton}
+            onPress={() => {
+              translateY.value = withTiming(400, { duration: 300 }, () => {
+                runOnJS(onClose)(); // call onClose after animation
+              });
+            }}
+          >
             <Text style={styles.outlineText}>Continue shopping</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.filledButton} onPress={onCheckout}>
+          <TouchableOpacity
+            style={styles.filledButton}
+            onPress={() => {
+              translateY.value = withTiming(400, { duration: 300 }, () => {
+                runOnJS(onCheckout)();
+              });
+            }}
+          >
             <Text style={styles.filledText}>Proceed to checkout</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
