@@ -59,8 +59,9 @@ export default function AddToCartButton({
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "#000",
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
+    width: 120,
   },
   text: {
     color: "#fff",

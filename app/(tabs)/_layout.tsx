@@ -59,7 +59,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="wishlist"
         options={{
-          title: "wishlist",
+          title: "Favourites",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart-outline" size={size} color={color} />
           ),
