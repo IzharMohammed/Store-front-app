@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function AddToCartButton({
   productId,
@@ -28,7 +29,12 @@ export default function AddToCartButton({
     setIsPending(false);
     if (retryResult.success) {
       setIsSuccess(true);
-      Alert.alert("Item added to cart!");
+      // Alert.alert("Item added to cart!");
+      Toast.show({
+        type: "success",
+        text1: "Added to cart 🛒",
+      });
+
       setTimeout(() => setIsSuccess(false), 3000);
     } else {
       console.error(retryResult.message);
