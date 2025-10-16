@@ -7,34 +7,36 @@ import {
   StyleSheet,
   Text,
 } from "react-native";
-import Toast from "react-native-toast-message";
+import CartAddedModal from "./cart-modal";
 
 export default function AddToCartButton({
   productId,
   quantity = 1,
   disabled = false,
+  product,
 }: {
   productId: string;
   quantity?: number;
   disabled?: boolean;
+  product?: { name: string; price: number; image?: string };
 }) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const handleCartAction = async () => {
     setIsPending(true);
     const retryResult = await addToCart({ productId, quantity });
-    console.log("retryResult", retryResult);
-
     setIsPending(false);
+
     if (retryResult.success) {
       setIsSuccess(true);
-      Alert.alert("Item added to cart!");
+      // Alert.alert("Item added to cart!");
       // Toast.show({
       //   type: "success",
       //   text1: "Added to cart 🛒",
       // });
-
+      setVisible(true);
       setTimeout(() => setIsSuccess(false), 3000);
     } else {
       console.error(retryResult.message);
@@ -43,22 +45,32 @@ export default function AddToCartButton({
   };
 
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.button,
-        pressed && { backgroundColor: "#333" }, // change style when pressed
-      ]}
-      onPress={handleCartAction}
-      disabled={disabled || isPending}
-    >
-      {isPending ? (
-        <ActivityIndicator color="#fff" />
-      ) : (
-        <Text style={styles.text}>
-          {isSuccess ? "Added!" : "+ Add to Cart"}
-        </Text>
-      )}
-    </Pressable>
+    <>
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed && { backgroundColor: "#333" }, // change style when pressed
+        ]}
+        onPress={handleCartAction}
+        disabled={disabled || isPending}
+      >
+        {isPending ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.text}>
+            {isSuccess ? "Added!" : "+ Add to Cart"}
+          </Text>
+        )}
+      </Pressable>
+      <CartAddedModal
+        visible={visible}
+        onClose={() => setVisible(false)}
+        onCheckout={() => {
+          setVisible(false);
+        }}
+        product={product}
+      />
+    </>
   );
 }
 

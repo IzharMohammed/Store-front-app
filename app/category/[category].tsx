@@ -47,23 +47,28 @@ export default function ProductsByCategory() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={{ uri: item.image?.[0] }} style={styles.image} />
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push(`/product/${item.id}`)}
+          >
+            <View style={styles.card}>
+              <Image source={{ uri: item.image?.[0] }} style={styles.image} />
 
-            <View
-              style={[
-                styles.tag,
-                { backgroundColor: item.discount ? "#000" : "#444" },
-              ]}
-            >
-              <Text style={styles.tagText}>
-                {item.discount ? "Sale" : "New"}
-              </Text>
+              <View
+                style={[
+                  styles.tag,
+                  { backgroundColor: item.discount ? "#000" : "#444" },
+                ]}
+              >
+                <Text style={styles.tagText}>
+                  {item.discount ? "Sale" : "New"}
+                </Text>
+              </View>
+
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.price}>${item.price}</Text>
             </View>
-
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.price}>${item.price}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </SafeAreaView>

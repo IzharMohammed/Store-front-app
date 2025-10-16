@@ -128,7 +128,14 @@ export default function ProductDetailPage() {
           {/* <Text onPress={()=>handleAddToCart()} style={styles.cartText}>
             + Add to cart
           </Text> */}
-          <AddToCartButton productId={product.id} />
+          <AddToCartButton
+            productId={product.id}
+            product={{
+              name: product.name,
+              price: product.price,
+              image: product.image ? product.image[0] : undefined,
+            }}
+          />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
