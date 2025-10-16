@@ -1,6 +1,8 @@
 import { storage } from "@/utils/storage";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
+import { Provider as PaperProvider } from "react-native-paper";
+import Toast from "react-native-toast-message";
 
 function RouteGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -39,11 +41,14 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <RouteGuard>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" options={{ title: "Auth" }} />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </RouteGuard>
+    <PaperProvider>
+      <RouteGuard>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" options={{ title: "Auth" }} />
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+        <Toast />
+      </RouteGuard>
+    </PaperProvider>
   );
 }

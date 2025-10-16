@@ -8,7 +8,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -16,12 +15,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Button, Dialog, Paragraph, Portal } from "react-native-paper";
+import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CartScreen() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [visible, setVisible] = useState(false);
 
   const navigation = useNavigation();
 
@@ -78,21 +81,44 @@ export default function CartScreen() {
   };
 
   const handleDelete = async (cartId: string) => {
-    Alert.alert("Remove Item", "Are ou sure you want to remove this item?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: async () => {
-          await removeFromCart(cartId);
-          fetchCartData();
-        },
-      },
-    ]);
+    // Alert.alert("Remove Item", "Are ou sure you want to remove this item?", [
+    //   { text: "Cancel", style: "cancel" },
+    //   {
+    //     text: "Remove",
+    //     style: "destructive",
+    //     onPress: async () => {
+    //       await removeFromCart(cartId);
+    //       fetchCartData();
+    //     },
+    //   },
+    // ]);
+    // Toast.show({
+    //   type: "info",
+    //   text1: "Remove item?",
+    //   text2: "Tap to confirm removing this item",
+    //   visibilityTime: 4000,
+    //   autoHide: true,
+    //   position: "bottom",
+    //   onPress: async () => {
+    //     await removeFromCart(cartId);
+    //     fetchCartData();
+    //     Toast.show({
+    //       type: "success",
+    //       text1: "Item removed",
+    //       position: "bottom",
+    //     });
+    //   },
+    // });
+    setSelectedId(cartId);
+    setVisible(true);
   };
 
   const renderItem = ({ item }: { item: CartItem }) => (
-    <View style={styles.card}>
+    <Animated.View
+      entering={FadeInUp.springify().delay(100)}
+      exiting={FadeOutDown.springify()}
+      style={styles.card}
+    >
       <Image source={{ uri: item.product.image[0] }} style={styles.image} />
 
       <View style={styles.info}>
@@ -123,7 +149,7 @@ export default function CartScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 
   const onRefresh = async () => {
@@ -141,7 +167,33 @@ export default function CartScreen() {
         onRefresh={onRefresh}
         refreshing={refreshing}
         contentContainerStyle={styles.list}
+        // ListFooterComponentStyle={{ paddingBottom: 0 }}
       />
+
+      <Portal>
+        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+          <Dialog.Title>Remove Item</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>
+              Are you sure you want to remove this item from your cart?
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setVisible(false)}>Cancel</Button>
+            <Button
+              onPress={async () => {
+                if (selectedId) {
+                  await removeFromCart(selectedId);
+                  fetchCartData();
+                  setVisible(false);
+                }
+              }}
+            >
+              Remove
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
 
       <View style={styles.summary}>
         <View style={styles.row}>
@@ -180,7 +232,8 @@ const styles = StyleSheet.create({
   summary: {
     borderTopWidth: 1,
     borderColor: "#eee",
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   actionsRow: {
     flexDirection: "row",

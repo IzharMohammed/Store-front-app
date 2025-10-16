@@ -1,6 +1,7 @@
 import { getWishlistItems } from "@/actions/wishlist";
 import { WishlistItemCard } from "@/components/wishlist-item-card";
 import { WishlistItem } from "@/types/wishlist";
+import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -28,9 +29,12 @@ export default function WishlistScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchWishlist();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchWishlist();
+    }, [])
+  );
+
 
   const handleWishlistChange = useCallback(() => {
     fetchWishlist();
