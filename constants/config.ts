@@ -8,6 +8,7 @@ interface ApiConfig {
         products: string;
         carts: string;
         wishlist: string;
+        orders: string;
     };
 }
 
@@ -20,6 +21,7 @@ export const API_CONFIG: ApiConfig = {
         banners: '/v1/banners',
         products: '/v1/products',
         carts: '/v1/cart',
-        wishlist: '/v1/wishlist,'
+        wishlist: '/v1/wishlist',
+        orders: '/v1/order',
     }
 }

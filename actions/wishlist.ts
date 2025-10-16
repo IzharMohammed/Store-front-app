@@ -3,7 +3,7 @@ import { storage } from "@/utils/storage";
 
 export async function buildHeaders() {
     const user = await storage.getUserData();
-
+    
     return {
         "Content-Type": "application/json",
         "x-api-key": API_CONFIG.apiKey || "",
