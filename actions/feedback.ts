@@ -40,8 +40,8 @@ export async function getFeedbackItems() {
     }
 }
 
-export async function getProductFeedback({productId, limit = 10, offset = 0}: {productId: string, limit?: number, offset?: number}) {
-const headers = await buildHeaders();
+export async function getProductFeedback({ productId, limit = 10, offset = 0 }: { productId: string, limit?: number, offset?: number }) {
+    const headers = await buildHeaders();
     try {
         const url = new URL(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.feedback}/product/${productId}`);
         url.searchParams.append("limit", limit.toString());
@@ -72,7 +72,7 @@ const headers = await buildHeaders();
     }
 }
 
-export async function createFeedback({productId, comment, rating}: {productId: string, comment: string, rating?: number}): Promise<{ success: boolean, message: string, reason?: string }> {
+export async function createFeedback({ productId, comment, rating }: { productId: string, comment: string, rating?: number }): Promise<{ success: boolean, message: string, reason?: string }> {
     const headers = await buildHeaders();
 
     // Basic validation
@@ -107,7 +107,7 @@ export async function createFeedback({productId, comment, rating}: {productId: s
 
         const result = await response.json();
         console.log("result from createFeedback", result);
-        
+
         return {
             success: true,
             message: result.message || "Feedback added successfully",
@@ -121,7 +121,7 @@ export async function createFeedback({productId, comment, rating}: {productId: s
     }
 }
 
-export async function updateFeedback({feedbackId, comment}: {feedbackId: string, comment: string}): Promise<{ success: boolean, message: string, reason?: string }> {
+export async function updateFeedback({ feedbackId, comment }: { feedbackId: string, comment: string }): Promise<{ success: boolean, message: string, reason?: string }> {
     const headers = await buildHeaders();
 
     // Basic validation
@@ -164,7 +164,7 @@ export async function updateFeedback({feedbackId, comment}: {feedbackId: string,
 
         const result = await response.json();
         console.log("result from updateFeedback", result);
-        
+
 
         return {
             success: true,
@@ -179,7 +179,7 @@ export async function updateFeedback({feedbackId, comment}: {feedbackId: string,
     }
 }
 
-export async function deleteFeedback({feedbackId, productId}: {feedbackId: string, productId?: string}): Promise<{ success: boolean, message: string, reason?: string }> {
+export async function deleteFeedback({ feedbackId, productId }: { feedbackId: string, productId?: string }): Promise<{ success: boolean, message: string, reason?: string }> {
     const headers = await buildHeaders();
 
     // Basic validation

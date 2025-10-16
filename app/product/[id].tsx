@@ -1,6 +1,8 @@
 import { getProductById, getProducts } from "@/actions/product";
+import { getWishlistItems } from "@/actions/wishlist";
 import AddToCartButton from "@/components/cart-button";
 import { ProductImageCarousel } from "@/components/image-carousel";
+import WishlistButton from "@/components/wishlist-button";
 import { Product } from "@/types/product";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -24,6 +26,9 @@ export default function ProductDetailPage() {
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [wishlistData, setWishlistData] = useState<{
+    data?: { id: string; productId: string }[];
+  }>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +46,8 @@ export default function ProductDetailPage() {
           );
         }
       }
+
+      setWishlistData(await getWishlistItems());
     };
 
     fetchData();
@@ -57,7 +64,14 @@ export default function ProductDetailPage() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={22} color="#000" />
         </TouchableOpacity>
-        <Ionicons name="heart-outline" size={22} color="#000" />
+        {/* <Ionicons name="heart-outline" size={22} color="#000" /> */}
+        <WishlistButton
+          wishlistData={wishlistData}
+          productId={product.id}
+          onWishlistChange={async () => {
+            setWishlistData(await getWishlistItems());
+          }}
+        />
       </View>
 
       <ScrollView

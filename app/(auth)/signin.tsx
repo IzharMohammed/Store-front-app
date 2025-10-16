@@ -65,7 +65,7 @@ export default function SignInScreen() {
         Alert.alert("Success!", "Your account has been created successfully", [
           {
             text: "Continue",
-            onPress: () => router.replace("/(tabs)/home"),
+            onPress: () => router.replace("/home"),
           },
         ]);
       }
