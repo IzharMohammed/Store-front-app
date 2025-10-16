@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { addToWishlist, removeFromWishlist } from "@/actions/wishlist";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import Toast from "react-native-toast-message"; // lightweight toast library
 
 interface WishlistButtonProps {
@@ -27,12 +27,15 @@ export default function WishlistButton({
     setIsPending(true);
     try {
       if (isInWishlist && wishlistItem) {
+        console.log("removeFromWishlist");
         await removeFromWishlist(wishlistItem.id);
         Toast.show({
           type: "success",
           text1: "Removed from wishlist ❤️‍🔥",
         });
       } else {
+        console.log("adding item to wishlist");
+
         await addToWishlist(productId);
         Toast.show({
           type: "success",
