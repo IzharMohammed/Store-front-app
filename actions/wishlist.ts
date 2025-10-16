@@ -1,9 +1,10 @@
 import { API_CONFIG } from "@/constants/config";
+import { WishlistActionResponse, WishlistResponse } from "@/types/wishlist";
 import { storage } from "@/utils/storage";
 
 export async function buildHeaders() {
     const user = await storage.getUserData();
-    
+
     return {
         "Content-Type": "application/json",
         "x-api-key": API_CONFIG.apiKey || "",
@@ -11,7 +12,7 @@ export async function buildHeaders() {
     }
 }
 
-export async function getWishlistItems() {
+export async function getWishlistItems(): Promise<WishlistResponse> {
     const headers = await buildHeaders();
     try {
 
@@ -37,7 +38,7 @@ export async function getWishlistItems() {
     }
 }
 
-export async function addToWishlist(productId: string): Promise<{ success: boolean, message: string }> {
+export async function addToWishlist(productId: string): Promise<WishlistActionResponse> {
     const headers = await buildHeaders();
 
     // Basic validation
@@ -55,6 +56,7 @@ export async function addToWishlist(productId: string): Promise<{ success: boole
             headers,
             body: JSON.stringify({ productId }),
         });
+        console.log("response from add to wishlist", response);
 
         if (!response.ok) {
             const errorData = await response.json();
@@ -86,7 +88,7 @@ export async function addToWishlist(productId: string): Promise<{ success: boole
     }
 }
 
-export async function removeFromWishlist(itemId: string): Promise<{ success: boolean, message: string }> {
+export async function removeFromWishlist(itemId: string): Promise<WishlistActionResponse> {
     const headers = await buildHeaders();
     // Basic validation
     if (!itemId) {
@@ -97,10 +99,11 @@ export async function removeFromWishlist(itemId: string): Promise<{ success: boo
     }
 
     try {
-        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.wishlist}`, {
+        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.wishlist}/${itemId}`, {
             method: "DELETE",
             headers,
         });
+        console.log("response from remove from wishlist", response);
 
         if (!response.ok) {
             const errorData = await response.json();
