@@ -2,8 +2,7 @@ import { API_CONFIG } from "@/constants/config";
 import { CartResponse } from "@/types/cart";
 import { storage } from "@/utils/storage";
 
-export async function buildHeaders() {
-    const user = await storage.getUserData();
+export async function buildHeaders() { const user = await storage.getUserData();
 
     return {
         "Content-Type": "application/json",
