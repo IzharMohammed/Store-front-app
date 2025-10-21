@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Modal from "react-native-modal";
@@ -20,6 +21,7 @@ export default function CartAddedModal({
   product?: { name: string; price: number; image?: string };
 }) {
   const translateY = useSharedValue(0);
+  const router = useRouter();
 
   React.useEffect(() => {
     // Slide up when visible
@@ -73,7 +75,12 @@ export default function CartAddedModal({
               });
             }}
           >
-            <Text style={styles.filledText}>Proceed to checkout</Text>
+            <Text
+              onPress={() => router.push("/checkout/shipping")}
+              style={styles.filledText}
+            >
+              Proceed to checkout
+            </Text>
           </TouchableOpacity>
         </View>
       </Animated.View>

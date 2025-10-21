@@ -54,6 +54,13 @@ export interface OrderItemRequest {
     price: number;
 }
 
+export interface SavedAddress extends ShippingAddress {
+    id: string;
+    isDefault?: boolean;
+    customerName?: string;
+    customerPhone?: string;
+}
+
 export interface ShippingAddress {
     street: string;
     city: string;
