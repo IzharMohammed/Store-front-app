@@ -97,8 +97,8 @@ export interface OrderResponse {
     customerEmail?: string;
     customerName?: string;
     customerPhone?: string;
-    shippingAddress?: ShippingAddress | string | null;
-    billingAddress?: ShippingAddress | string | null;
+    shippingAddress?: ShippingAddress;
+    billingAddress?: ShippingAddress;
     createdAt: string;
     updatedAt: string;
     customerId?: string;

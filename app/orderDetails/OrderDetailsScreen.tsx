@@ -171,13 +171,13 @@ const styles = StyleSheet.create({
   },
   orderId: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "500",
   },
   orderDate: {
-    color: "#777",
-    fontSize: 13,
+    fontSize: 18,
     marginTop: 2,
-  },
+    fontWeight:"700",
+},
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
