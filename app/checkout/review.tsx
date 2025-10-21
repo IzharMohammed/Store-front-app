@@ -171,11 +171,11 @@ export default async function ReviewOrder() {
           entering={FadeInDown.delay(200).duration(400).springify()}
           style={styles.section}
         >
+          <Text style={styles.sectionTitle}>Products</Text>
           <Text style={styles.productSummaryText}>
             {totalItems} {totalItems === 1 ? "item" : "items"} — Total Quantity:{" "}
             {totalQuantity}
           </Text>
-          <Text style={styles.sectionTitle}>Products</Text>
           {products &&
             products.map((product, i) => {
               const quantity =
@@ -392,10 +392,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   productImage: {
-    width: 60,
-    height: 80,
-    borderRadius: 8,
-    backgroundColor: "#f5f5f5",
+    // width: 60,
+    // height: 80,
+    // borderRadius: 8,
+    // backgroundColor: "#f5f5f5",
+    width: 85,
+    height: 120,
+    borderRadius: 6,
   },
   productInfo: {
     marginLeft: 12,
