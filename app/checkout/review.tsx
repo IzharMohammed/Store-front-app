@@ -22,6 +22,12 @@ export default function ReviewOrder() {
     useCheckout();
   const [products, setProducts] = useState<CartItem[]>([]);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const totalItems = products.length;
+  const totalQuantity = products.reduce((sum, p) => {
+    const quantity =
+      items.find((item) => item.productId === p.id)?.quantity || 1;
+    return sum + quantity;
+  }, 0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -49,6 +55,8 @@ export default function ReviewOrder() {
 
   const shipping = 9.99;
   const tax = 0;
+  const total = subtotal + shipping + tax;
+
   //   const total = subtotal + shipping + tax;
   const placeOrder = async () => {
     try {
@@ -82,7 +90,10 @@ export default function ReviewOrder() {
           text1: "Order placed successfully!",
           text2: "Thank you for your purchase.",
         });
-        router.push("/order");
+
+        setTimeout(() => {
+          router.push("/order");
+        }, 1500);
       } else {
         Toast.show({
           type: "error",
@@ -102,8 +113,11 @@ export default function ReviewOrder() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header with Back and Complete buttons */}
-      <View style={styles.topHeader}>
+      {/* 🔹 Header with Back and Complete buttons (animated) */}
+      <Animated.View
+        entering={FadeInDown.duration(300).springify()}
+        style={styles.topHeader}
+      >
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -113,13 +127,12 @@ export default function ReviewOrder() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          //   onPress={() => router.push("/checkout/payment")}
           onPress={() => placeOrder()}
           style={styles.completeButton}
         >
           <Text style={styles.completeButtonText}>Complete</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* Progress Indicator */}
       <View style={styles.progressContainer}>
@@ -129,8 +142,11 @@ export default function ReviewOrder() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
-        {/* Review Order Header */}
-        <Animated.View entering={FadeInDown} style={styles.reviewHeader}>
+        {/* 🔹 Review Order Header (animated) */}
+        <Animated.View
+          entering={FadeInDown.delay(100).duration(400).springify()}
+          style={styles.reviewHeader}
+        >
           <View>
             <Text style={styles.reviewTitle}>Review order</Text>
             <Text style={styles.reviewSubtitle}>
@@ -140,16 +156,27 @@ export default function ReviewOrder() {
           <Text style={styles.reviewEmoji}>📝✏️</Text>
         </Animated.View>
 
-        {/* Products Section */}
-        <View style={styles.section}>
+        {/* 🔹 Products Section */}
+        <Animated.View
+          entering={FadeInDown.delay(200).duration(400).springify()}
+          style={styles.section}
+        >
+          <Text style={styles.productSummaryText}>
+            {totalItems} {totalItems === 1 ? "item" : "items"} — Total Quantity:{" "}
+            {totalQuantity}
+          </Text>
           <Text style={styles.sectionTitle}>Products</Text>
           {products &&
-            products.map((product) => {
+            products.map((product, i) => {
               const quantity =
                 items.find((item) => item.productId === product.id)?.quantity ||
                 1;
               return (
-                <View key={product.id} style={styles.productCard}>
+                <Animated.View
+                  key={product.id}
+                  entering={FadeInDown.delay(200 + i * 100).springify()}
+                  style={styles.productCard}
+                >
                   <Image
                     source={{
                       uri:
@@ -171,13 +198,17 @@ export default function ReviewOrder() {
                       ${product.product.price.toFixed(2)}
                     </Text>
                   </View>
-                </View>
+                </Animated.View>
               );
             })}
-        </View>
+        </Animated.View>
+        <Text style={styles.sectionTitle}>Products</Text>
 
-        {/* Shipping Address Section */}
-        <View style={styles.section}>
+        {/* 🔹 Shipping Address Section */}
+        <Animated.View
+          entering={FadeInDown.delay(400).duration(400).springify()}
+          style={styles.section}
+        >
           <Text style={styles.sectionTitle}>Shipping Address</Text>
           {shippingAddress ? (
             <View style={styles.addressCard}>
@@ -193,10 +224,13 @@ export default function ReviewOrder() {
           ) : (
             <Text style={styles.emptyText}>No shipping address selected</Text>
           )}
-        </View>
+        </Animated.View>
 
-        {/* Payment Method Section */}
-        <View style={styles.section}>
+        {/* 🔹 Payment Method Section */}
+        <Animated.View
+          entering={FadeInDown.delay(500).duration(400).springify()}
+          style={styles.section}
+        >
           <Text style={styles.sectionTitle}>Payment Method</Text>
           {paymentMethod ? (
             <View style={styles.paymentCard}>
@@ -215,7 +249,51 @@ export default function ReviewOrder() {
           ) : (
             <Text style={styles.emptyText}>No payment method selected</Text>
           )}
-        </View>
+        </Animated.View>
+
+        {/* 🔹 Order Summary Section */}
+        <Animated.View
+          entering={FadeInDown.delay(600).duration(400).springify()}
+          style={[styles.section, { marginBottom: 40 }]}
+        >
+          <Text style={styles.sectionTitle}>Order Summary</Text>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Subtotal</Text>
+            <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
+          </View>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Shipping</Text>
+            <Text style={styles.summaryValue}>${shipping.toFixed(2)}</Text>
+          </View>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Tax</Text>
+            <Text style={styles.summaryValue}>${tax.toFixed(2)}</Text>
+          </View>
+
+          <View
+            style={[
+              styles.summaryRow,
+              {
+                marginTop: 8,
+                borderTopWidth: 1,
+                borderColor: "#eee",
+                paddingTop: 8,
+              },
+            ]}
+          >
+            <Text style={[styles.summaryLabel, { fontWeight: "700" }]}>
+              Total
+            </Text>
+            <Text
+              style={[styles.summaryValue, { fontWeight: "700", fontSize: 18 }]}
+            >
+              ${total.toFixed(2)}
+            </Text>
+          </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -373,5 +451,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#999",
     fontStyle: "italic",
+  },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 6,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: "#555",
+  },
+  summaryValue: {
+    fontSize: 14,
+    color: "#000",
+  },
+  productSummaryText: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 10,
   },
 });
