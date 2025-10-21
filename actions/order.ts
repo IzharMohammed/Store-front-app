@@ -1,4 +1,5 @@
 import { API_CONFIG } from "@/constants/config";
+import { OrdersResponse } from "@/types/order";
 import { storage } from "@/utils/storage";
 
 export async function buildHeaders() {
@@ -11,7 +12,7 @@ export async function buildHeaders() {
     }
 }
 
-export async function getOrders() {
+export async function getOrders(): Promise<OrdersResponse> {
     const headers = await buildHeaders();
     try {
 
@@ -28,9 +29,7 @@ export async function getOrders() {
         // return response.json();
         const data = await response.json();
 
-        return {
-            ...data,
-        };
+        return data as OrdersResponse;
     } catch (error) {
         console.error("Error fetching orders:", error);
         throw error;
