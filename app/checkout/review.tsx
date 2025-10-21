@@ -2,6 +2,7 @@ import { getCartItems } from "@/actions/cart";
 import { createOrder } from "@/actions/order";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import { CartItem } from "@/types/cart";
+import { storage } from "@/utils/storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -16,7 +17,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
-export default function ReviewOrder() {
+export default async function ReviewOrder() {
   const router = useRouter();
   const { shippingAddress, paymentMethod, items, customerPhone } =
     useCheckout();
@@ -28,11 +29,20 @@ export default function ReviewOrder() {
       items.find((item) => item.productId === p.id)?.quantity || 1;
     return sum + quantity;
   }, 0);
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await storage.getUserData();
+      setUserData(userData);
+    };
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      const res = await getCartItems();
       try {
-        const res = await getCartItems();
         if (res?.success && res.data) {
           setProducts(res.data);
         }
@@ -202,7 +212,6 @@ export default function ReviewOrder() {
               );
             })}
         </Animated.View>
-        <Text style={styles.sectionTitle}>Products</Text>
 
         {/* 🔹 Shipping Address Section */}
         <Animated.View
@@ -212,7 +221,8 @@ export default function ReviewOrder() {
           <Text style={styles.sectionTitle}>Shipping Address</Text>
           {shippingAddress ? (
             <View style={styles.addressCard}>
-              <Text style={styles.addressName}>John Doe</Text>
+              <Text style={styles.addressName}>{userData?.name}</Text>
+              <Text style={styles.addressText}>{userData.email}</Text>
               <Text style={styles.addressText}>{shippingAddress.street}</Text>
               <Text style={styles.addressText}>
                 {shippingAddress.city}, {shippingAddress.state}{" "}

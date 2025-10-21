@@ -78,11 +78,10 @@ export default function Shipping() {
       <View style={styles.progressContainer}>
         <View style={styles.progressHeader}>
           <Text style={styles.progressLabel}>Shipping</Text>
-          <Text style={styles.progressLabel}>Review</Text>
           <Text style={styles.progressLabel}>Payment</Text>
         </View>
         <View style={styles.progressBarBg}>
-          <View style={[styles.progressBarFill, { width: "33%" }]} />
+          <View style={[styles.progressBarFill, { width: "50%" }]} />
         </View>
       </View>
 
@@ -91,7 +90,7 @@ export default function Shipping() {
           <Text style={styles.title}>Shipping Address</Text>
           <TouchableOpacity
             disabled={!selectedAddress}
-            onPress={() => router.push("/checkout/payment")}
+            onPress={() => router.push("/checkout/review")}
           >
             <Text style={styles.nextButton}>Next</Text>
           </TouchableOpacity>

@@ -34,6 +34,17 @@ export default function OrderDetailsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          //   display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: 16,
+          marginBottom: 10,
+        }}
+      >
         <View style={{ flex: 1 }}>
           <Text style={styles.orderId}>
             #ORD-{parsedOrder.id.slice(-6).toUpperCase()}
@@ -55,7 +66,7 @@ export default function OrderDetailsScreen() {
           <Text style={styles.statusText}>{parsedOrder.status}</Text>
         </View>
       </View>
-
+      <View style={styles.darkSeperator} />
       {/* Scrollable content */}
       <ScrollView
         contentContainerStyle={{
@@ -82,7 +93,7 @@ export default function OrderDetailsScreen() {
           </Animated.View>
         ))}
 
-        <View style={styles.separator} />
+        <View style={styles.darkSeperator} />
 
         {/* Order Summary */}
         <View style={styles.summaryContainer}>
@@ -94,7 +105,6 @@ export default function OrderDetailsScreen() {
           <SummaryRow label="Total" value={`$${total.toFixed(2)}`} bold />
         </View>
       </ScrollView>
-
       {/* Fixed bottom section */}
       <View style={styles.bottomSection}>
         <Text style={styles.sectionTitle}>Shipping Address</Text>
@@ -158,26 +168,32 @@ const getStatusColor = (status: string) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-
+  darkSeperator: {
+    height: 4,
+    backgroundColor: "#eee",
+    marginVertical: 12,
+  },
   headerContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "baseline",
     paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 8,
+    marginTop: 20,
   },
   backIcon: {
     marginRight: 12,
   },
   orderId: {
-    fontSize: 18,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "400",
+    marginTop: 10,
   },
   orderDate: {
-    fontSize: 18,
+    fontSize: 20,
     marginTop: 2,
-    fontWeight:"700",
-},
+    fontWeight: "700",
+  },
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -193,13 +209,16 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   productImg: {
-    width: 55,
-    height: 55,
-    borderRadius: 8,
+    // width: 55,
+    // height: 55,
+    // borderRadius: 8,
+    width: 85,
+    height: 120,
+    borderRadius: 6,
   },
   productName: {
-    fontWeight: "600",
-    fontSize: 15,
+    fontWeight: "700",
+    fontSize: 16,
   },
   productQty: {
     color: "#777",
@@ -255,11 +274,11 @@ const styles = StyleSheet.create({
   cancelBtn: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ef4444",
+    borderColor: "#000",
     borderRadius: 8,
     padding: 10,
     alignItems: "center",
-    marginRight: 6,
+    marginHorizontal: 6,
   },
   trackBtn: {
     flex: 1,
@@ -278,7 +297,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: 6,
   },
-  cancelText: { color: "#ef4444", fontWeight: "600" },
+  cancelText: { color: "#000", fontWeight: "600" },
   trackText: { color: "#000", fontWeight: "600" },
   reviewText: { color: "#fff", fontWeight: "600" },
 });
