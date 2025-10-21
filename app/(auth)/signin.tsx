@@ -1,5 +1,5 @@
-import { Button } from "@/components/UI/Button";
-import { Input } from "@/components/UI/Input";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { authService } from "@/services/auth";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
