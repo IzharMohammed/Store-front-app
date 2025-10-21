@@ -71,9 +71,25 @@ export default function Shipping() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.progressContainer}>
+        <View style={styles.progressHeader}>
+          <Text style={styles.progressLabel}>Shipping</Text>
+          <Text style={styles.progressLabel}>Review</Text>
+          <Text style={styles.progressLabel}>Payment</Text>
+        </View>
+        <View style={styles.progressBarBg}>
+          <View style={[styles.progressBarFill, { width: "33%" }]} />
+        </View>
+      </View>
+
       <Animated.View entering={FadeInDown} style={[styles.header, style]}>
-        <Text style={styles.title}>Shipping Address</Text>
-        <Text style={styles.subtitle}>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Shipping Address</Text>
+          <TouchableOpacity onPress={() => router.push("/checkout/review")}>
+            <Text style={styles.nextButton}>Next</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.nextButtonText}>
           Choose from saved addresses or add new
         </Text>
       </Animated.View>
@@ -197,5 +213,50 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     marginTop: 8,
+  },
+  progressContainer: {
+    paddingHorizontal: 16,
+    marginTop: 10,
+  },
+  progressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  progressLabel: {
+    fontSize: 12,
+    color: "#999",
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: "#eee",
+    borderRadius: 2,
+  },
+  progressBarFill: {
+    height: 4,
+    backgroundColor: "#000",
+    borderRadius: 2,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  nextBtn: {
+    color: "#000",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  nextButton: {
+    backgroundColor: "#000",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 7,
+    color: "white",
+  },
+  nextButtonText: {
+    color: "black",
+    fontWeight: "600",
+    fontSize: 14,
   },
 });
