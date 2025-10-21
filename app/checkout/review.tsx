@@ -18,6 +18,8 @@ export default function ReviewScreen() {
   const { shippingAddress, paymentMethod, items, clearCheckout } =
     useCheckout();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  console.log("shippingAddress", shippingAddress);
+  console.log("items", items);
 
   const subtotal = useMemo(
     () => items.reduce((s, it) => s + it.price * it.quantity, 0),

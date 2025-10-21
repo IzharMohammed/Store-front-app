@@ -22,6 +22,8 @@ export default function Shipping() {
   const router = useRouter();
   const { shippingAddress, setShippingAddress, setItems } = useCheckout();
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<any | null>(null);
+
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     street: "",
@@ -53,15 +55,17 @@ export default function Shipping() {
 
   const handleUseAddress = (addr: any) => {
     setShippingAddress(addr);
-    router.push("/checkout/payment");
+    setSelectedAddress(addr);
+    // router.push("/checkout/payment");
   };
 
   const handleSubmitNew = () => {
     // simple validation
     if (!form.street || !form.city) return;
     const addr = { ...form };
+    setSelectedAddress(addr);
     setShippingAddress(addr);
-    router.push("/checkout/payment");
+    setShowForm(false);
   };
 
   const anim = useSharedValue(1);
@@ -85,7 +89,10 @@ export default function Shipping() {
       <Animated.View entering={FadeInDown} style={[styles.header, style]}>
         <View style={styles.headerRow}>
           <Text style={styles.title}>Shipping Address</Text>
-          <TouchableOpacity onPress={() => router.push("/checkout/review")}>
+          <TouchableOpacity
+            disabled={!selectedAddress}
+            onPress={() => router.push("/checkout/review")}
+          >
             <Text style={styles.nextButton}>Next</Text>
           </TouchableOpacity>
         </View>
@@ -93,6 +100,24 @@ export default function Shipping() {
           Choose from saved addresses or add new
         </Text>
       </Animated.View>
+
+      {selectedAddress && (
+        <Animated.View entering={FadeInDown} style={styles.selectedCard}>
+          <Text style={{ fontWeight: "700", fontSize: 16 }}>
+            Selected Address
+          </Text>
+          <View style={{ marginTop: 8 }}>
+            <Text style={{ fontWeight: "600" }}>{selectedAddress.street}</Text>
+            <Text style={{ color: "#555", marginTop: 4 }}>
+              {selectedAddress.city}, {selectedAddress.state}{" "}
+              {selectedAddress.zipCode}
+            </Text>
+            <Text style={{ color: "#777", marginTop: 6 }}>
+              {selectedAddress.country}
+            </Text>
+          </View>
+        </Animated.View>
+      )}
 
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
         {savedAddresses.length === 0 && (
@@ -216,7 +241,7 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     paddingHorizontal: 16,
-    marginTop: 10,
+    marginTop: 25,
   },
   progressHeader: {
     flexDirection: "row",
@@ -258,5 +283,13 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "600",
     fontSize: 14,
+  },
+  selectedCard: {
+    margin: 16,
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: "#f5f5f5",
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
 });
