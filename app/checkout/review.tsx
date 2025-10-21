@@ -1,9 +1,11 @@
-import { createOrder } from "@/actions/order";
+import { getCartItems } from "@/actions/cart";
 import { useCheckout } from "@/contexts/CheckoutContext";
+import { CartItem } from "@/types/cart";
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  FlatList,
+  Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,153 +13,310 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 
-export default function ReviewScreen() {
+export default function ReviewOrder() {
   const router = useRouter();
-  const { shippingAddress, paymentMethod, items, clearCheckout } =
-    useCheckout();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  console.log("shippingAddress", shippingAddress);
-  console.log("items", items);
+  const { shippingAddress, paymentMethod, items } = useCheckout();
+  const [products, setProducts] = useState<CartItem[] | null>(null);
 
-  const subtotal = useMemo(
-    () => items.reduce((s, it) => s + it.price * it.quantity, 0),
-    [items]
-  );
-  const tax = +(subtotal * 0.1).toFixed(2);
-  const shipping = subtotal > 100 ? 0 : 9.99;
-  const total = +(subtotal + tax + shipping).toFixed(2);
-
-  const handlePlaceOrder = async () => {
-    if (!shippingAddress) {
-      Toast.show({ type: "error", text1: "Please select shipping address" });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const payload = {
-      shippingAddress,
-      items,
-      total,
-      customerPhone: undefined,
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await getCartItems();
+        if (res?.success && res.data) {
+          setProducts(res.data);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch products", err);
+      }
     };
 
-    const res = await createOrder(payload);
-    setIsSubmitting(false);
+    fetchProducts();
+  }, [items]);
+  console.log(products);
 
-    if (res.success) {
-      clearCheckout();
-      router.replace("/checkout/placed"); // move to placed screen
-    } else {
-      Toast.show({
-        type: "error",
-        text1: res.message || "Failed to place order",
-      });
-    }
-  };
+  const subtotal = products
+    ? products.reduce((sum, p) => {
+        const quantity =
+          items.find((item) => item.productId === p.id)?.quantity || 1;
+        return sum + p.product.price * quantity;
+      }, 0)
+    : 0;
+
+  const shipping = 9.99;
+  const tax = 0;
+  //   const total = subtotal + shipping + tax;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Animated.View entering={FadeInDown} style={styles.header}>
-        <Text style={styles.title}>Review order</Text>
-      </Animated.View>
+    <SafeAreaView style={styles.safeArea}>
+      {/* Header with Back and Complete buttons */}
+      <View style={styles.topHeader}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Text onPress={() => router.back()} style={styles.backButtonText}>
+            Back
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push("/checkout/payment")}
+          style={styles.completeButton}
+        >
+          <Text style={styles.completeButtonText}>Complete</Text>
+        </TouchableOpacity>
+      </View>
 
-      <FlatList
-        data={items}
-        keyExtractor={(it) => it.productId}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            {/* If you have product image in item, show it; here we don't, so placeholder */}
-            <View style={styles.thumbnail} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontWeight: "600" }}>{item.productId}</Text>
-              <Text style={{ color: "#666" }}>Qty: {item.quantity}</Text>
-            </View>
-            <Text style={{ fontWeight: "700" }}>${item.price}</Text>
+      {/* Progress Indicator */}
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBarBg}>
+          <View style={[styles.progressBarFill, { width: "67%" }]} />
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+        {/* Review Order Header */}
+        <Animated.View entering={FadeInDown} style={styles.reviewHeader}>
+          <View>
+            <Text style={styles.reviewTitle}>Review order</Text>
+            <Text style={styles.reviewSubtitle}>
+              Please check your order details
+            </Text>
           </View>
-        )}
-        ListFooterComponent={() => (
-          <View style={{ padding: 16 }}>
-            <View style={styles.summaryRow}>
-              <Text>Subtotal</Text>
-              <Text>${subtotal.toFixed(2)}</Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text>Shipping</Text>
-              <Text>${shipping.toFixed(2)}</Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text>Tax</Text>
-              <Text>${tax.toFixed(2)}</Text>
-            </View>
-            <View style={[styles.summaryRow, { marginTop: 10 }]}>
-              <Text style={{ fontWeight: "700" }}>Total</Text>
-              <Text style={{ fontWeight: "700" }}>${total.toFixed(2)}</Text>
-            </View>
+          <Text style={styles.reviewEmoji}>📝✏️</Text>
+        </Animated.View>
 
-            <View
-              style={{
-                marginTop: 12,
-                paddingTop: 12,
-                borderTopWidth: 1,
-                borderColor: "#eee",
-              }}
-            >
-              <Text style={{ fontWeight: "700" }}>Shipping Address</Text>
-              <Text style={{ color: "#555", marginTop: 6 }}>
-                {(shippingAddress as any)?.street}
-              </Text>
-              <Text style={{ color: "#555" }}>
-                {(shippingAddress as any)?.city},{" "}
-                {(shippingAddress as any)?.state}{" "}
-                {(shippingAddress as any)?.zipCode}
-              </Text>
-            </View>
+        {/* Products Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Products</Text>
+          {products &&
+            products.map((product) => {
+              const quantity =
+                items.find((item) => item.productId === product.id)?.quantity ||
+                1;
+              return (
+                <View key={product.id} style={styles.productCard}>
+                  <Image
+                    source={{
+                      uri:
+                        product.product.image?.[0] ||
+                        "https://via.placeholder.com/60",
+                    }}
+                    style={styles.productImage}
+                  />
+                  <View style={styles.productInfo}>
+                    <Text style={styles.productName}>
+                      {product.product.name}
+                    </Text>
+                    {product.product.description && (
+                      <Text style={styles.productDesc} numberOfLines={1}>
+                        {product.product.description}
+                      </Text>
+                    )}
+                    <Text style={styles.productPrice}>
+                      ${product.product.price.toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              );
+            })}
+        </View>
 
-            <TouchableOpacity
-              onPress={handlePlaceOrder}
-              style={[styles.primaryBtn, { opacity: isSubmitting ? 0.6 : 1 }]}
-            >
-              <Text style={{ color: "#fff", fontWeight: "700" }}>
-                {isSubmitting ? "Placing order..." : "Place Order"}
+        {/* Shipping Address Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Shipping Address</Text>
+          {shippingAddress ? (
+            <View style={styles.addressCard}>
+              <Text style={styles.addressName}>John Doe</Text>
+              <Text style={styles.addressText}>{shippingAddress.street}</Text>
+              <Text style={styles.addressText}>
+                {shippingAddress.city}, {shippingAddress.state}{" "}
+                {shippingAddress.zipCode}
               </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+              <Text style={styles.addressText}>{shippingAddress.country}</Text>
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>No shipping address selected</Text>
+          )}
+        </View>
+
+        {/* Payment Method Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Payment Method</Text>
+          {paymentMethod ? (
+            <View style={styles.paymentCard}>
+              <View style={styles.cardIcon}>
+                <Text>💳</Text>
+              </View>
+              <View>
+                <Text style={styles.paymentLabel}>{paymentMethod.label}</Text>
+                <Text style={styles.paymentType}>
+                  {paymentMethod.type === "card"
+                    ? "Credit Card"
+                    : paymentMethod.type}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>No payment method selected</Text>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { padding: 16, borderBottomWidth: 1, borderColor: "#eee" },
-  title: { fontSize: 20, fontWeight: "700" },
-  itemRow: {
-    flexDirection: "row",
-    padding: 12,
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderColor: "#f3f3f3",
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  thumbnail: {
-    width: 64,
-    height: 64,
-    borderRadius: 8,
-    backgroundColor: "#eee",
-    marginRight: 12,
-  },
-  summaryRow: {
+  topHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  backButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  completeButton: {
+    backgroundColor: "#000",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  completeButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  progressContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  progressBarBg: {
+    height: 4,
+    backgroundColor: "#eee",
+    borderRadius: 2,
+  },
+  progressBarFill: {
+    height: 4,
+    backgroundColor: "#000",
+    borderRadius: 2,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
     marginTop: 8,
   },
-  primaryBtn: {
-    marginTop: 18,
-    backgroundColor: "#000",
-    padding: 14,
+  reviewTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#000",
+  },
+  reviewSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 4,
+  },
+  reviewEmoji: {
+    fontSize: 32,
+  },
+  section: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: "#000",
+  },
+  productCard: {
+    flexDirection: "row",
+    marginBottom: 16,
+    backgroundColor: "#fff",
+  },
+  productImage: {
+    width: 60,
+    height: 80,
     borderRadius: 8,
+    backgroundColor: "#f5f5f5",
+  },
+  productInfo: {
+    marginLeft: 12,
+    flex: 1,
+    justifyContent: "center",
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  productDesc: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+  productPrice: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#000",
+    marginTop: 4,
+  },
+  addressCard: {
+    backgroundColor: "#fff",
+    padding: 0,
+  },
+  addressName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#000",
+    marginBottom: 4,
+  },
+  addressText: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 2,
+  },
+  paymentCard: {
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  cardIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: "#f5f5f5",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  paymentLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+  },
+  paymentType: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
   },
 });
