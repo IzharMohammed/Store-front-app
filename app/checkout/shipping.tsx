@@ -20,7 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Shipping() {
   const router = useRouter();
-  const { shippingAddress, setShippingAddress, setItems } = useCheckout();
+  const { setShippingAddress, setCustomerPhone, customerPhone } = useCheckout();
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<any | null>(null);
 
@@ -91,7 +91,7 @@ export default function Shipping() {
           <Text style={styles.title}>Shipping Address</Text>
           <TouchableOpacity
             disabled={!selectedAddress}
-            onPress={() => router.push("/checkout/review")}
+            onPress={() => router.push("/checkout/payment")}
           >
             <Text style={styles.nextButton}>Next</Text>
           </TouchableOpacity>
@@ -114,6 +114,9 @@ export default function Shipping() {
             </Text>
             <Text style={{ color: "#777", marginTop: 6 }}>
               {selectedAddress.country}
+            </Text>
+            <Text style={{ color: "#777", marginTop: 6 }}>
+              Phone: {customerPhone}
             </Text>
           </View>
         </Animated.View>
@@ -184,6 +187,12 @@ export default function Shipping() {
               placeholder="Country"
               value={form.country}
               onChangeText={(v) => setForm((s) => ({ ...s, country: v }))}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Phone Number"
+              value={customerPhone ?? ""}
+              onChangeText={(v) => setCustomerPhone(v)}
               style={styles.input}
             />
             <TouchableOpacity

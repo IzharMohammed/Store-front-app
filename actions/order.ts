@@ -53,6 +53,7 @@ export async function createOrder(orderData: any): Promise<{ success: boolean, m
             headers,
             body: JSON.stringify(orderData),
         });
+        console.log("response from createOrder", response);
 
         if (!response.ok) {
             const errorData = await response.json();

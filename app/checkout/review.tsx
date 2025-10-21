@@ -1,4 +1,5 @@
 import { getCartItems } from "@/actions/cart";
+import { createOrder } from "@/actions/order";
 import { useCheckout } from "@/contexts/CheckoutContext";
 import { CartItem } from "@/types/cart";
 import { useRouter } from "expo-router";
@@ -13,11 +14,14 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 export default function ReviewOrder() {
   const router = useRouter();
-  const { shippingAddress, paymentMethod, items } = useCheckout();
-  const [products, setProducts] = useState<CartItem[] | null>(null);
+  const { shippingAddress, paymentMethod, items, customerPhone } =
+    useCheckout();
+  const [products, setProducts] = useState<CartItem[]>([]);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -46,6 +50,55 @@ export default function ReviewOrder() {
   const shipping = 9.99;
   const tax = 0;
   //   const total = subtotal + shipping + tax;
+  const placeOrder = async () => {
+    try {
+      const items = products.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.product.price,
+      }));
+
+      const subtotal = products.reduce(
+        (sum, item) => sum + item.product.price * item.quantity,
+        0
+      );
+      const tax = subtotal * 0.1;
+      const shipping = subtotal > 100 ? 0 : 9.99;
+      const total = subtotal + tax + shipping;
+
+      const orderData = {
+        shippingAddress,
+        customerPhone: customerPhone || undefined,
+        items,
+        total,
+      };
+
+      const result = await createOrder(orderData);
+
+      if (result.success) {
+        setOrderSuccess(true);
+        Toast.show({
+          type: "success",
+          text1: "Order placed successfully!",
+          text2: "Thank you for your purchase.",
+        });
+        router.push("/order");
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Order placement failed.",
+          text2: result.message,
+        });
+      }
+    } catch (error) {
+      console.error("Order creation failed:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to create order.",
+        text2: "Please try again.",
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -60,7 +113,8 @@ export default function ReviewOrder() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push("/checkout/payment")}
+          //   onPress={() => router.push("/checkout/payment")}
+          onPress={() => placeOrder()}
           style={styles.completeButton}
         >
           <Text style={styles.completeButtonText}>Complete</Text>
@@ -70,7 +124,7 @@ export default function ReviewOrder() {
       {/* Progress Indicator */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBarBg}>
-          <View style={[styles.progressBarFill, { width: "67%" }]} />
+          <View style={[styles.progressBarFill, { width: "100%" }]} />
         </View>
       </View>
 
@@ -134,6 +188,7 @@ export default function ReviewOrder() {
                 {shippingAddress.zipCode}
               </Text>
               <Text style={styles.addressText}>{shippingAddress.country}</Text>
+              <Text style={styles.addressText}>Phone: {customerPhone}</Text>
             </View>
           ) : (
             <Text style={styles.emptyText}>No shipping address selected</Text>

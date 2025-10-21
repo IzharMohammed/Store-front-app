@@ -12,8 +12,10 @@ interface CheckoutState {
   billingAddress?: ShippingAddress | null;
   paymentMethod?: PaymentMethod | null;
   items: OrderItemRequest[];
+  customerPhone?: string | null;
   setShippingAddress: (address: ShippingAddress) => void;
   setBillingAddress: (address: ShippingAddress | null) => void;
+  setCustomerPhone: (phone: string | null) => void;
   setPaymentMethod: (method: PaymentMethod | null) => void;
   setItems: (items: OrderItemRequest[]) => void;
   clearCheckout: () => void;
@@ -31,6 +33,7 @@ export const CheckoutProvider: React.FC<{ children: React.ReactNode }> = ({
   const [paymentMethod, setPaymentMethod] =
     React.useState<PaymentMethod | null>(null);
   const [items, setItems] = React.useState<OrderItemRequest[]>([]);
+  const [customerPhone, setCustomerPhone] = React.useState<string>("");
 
   const clearCheckout = () => {
     setShippingAddress(null);
@@ -46,10 +49,12 @@ export const CheckoutProvider: React.FC<{ children: React.ReactNode }> = ({
         billingAddress: billingAddress ?? undefined,
         paymentMethod: paymentMethod ?? undefined,
         items,
+        customerPhone: customerPhone ?? undefined,
         setShippingAddress: (s) => setShippingAddress(s),
         setBillingAddress: (b) => setBillingAddress(b ?? null),
         setPaymentMethod: (p) => setPaymentMethod(p ?? null),
         setItems,
+        setCustomerPhone: (p) => setCustomerPhone(p ?? ""),
         clearCheckout,
       }}
     >
