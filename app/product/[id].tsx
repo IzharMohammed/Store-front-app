@@ -2,6 +2,7 @@ import { getProductById, getProducts } from "@/actions/product";
 import { getWishlistItems } from "@/actions/wishlist";
 import AddToCartButton from "@/components/cart/cart-button";
 import { ProductImageCarousel } from "@/components/image-carousel";
+import ReviewList from "@/components/reviews/review-list";
 import WishlistButton from "@/components/wishlist/wishlist-button";
 import { Product } from "@/types/product";
 import { Ionicons } from "@expo/vector-icons";
@@ -89,6 +90,11 @@ export default function ProductDetailPage() {
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.price}>${product.price}</Text>
           <Text style={styles.description}>{product.description}</Text>
+        </View>
+
+        {/* Reviews Section */}
+        <View style={styles.reviewsSection}>
+          <ReviewList productId={product.id} />
         </View>
 
         {/* Related Products */}
@@ -277,8 +283,8 @@ const styles = StyleSheet.create({
   },
   cartButton: {
     backgroundColor: "#000",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    // paddingVertical: 10,
+    // paddingHorizontal: 20,
     borderRadius: 10,
   },
   cartText: {

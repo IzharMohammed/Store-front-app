@@ -1,4 +1,5 @@
 import { getBanners } from "@/actions/banner";
+import { getOrders } from "@/actions/order";
 import { getProducts } from "@/actions/product";
 import { BannerItem } from "@/types/banner";
 import { Category } from "@/types/category";
@@ -36,6 +37,8 @@ export default function ProductsScreen() {
           getBanners(),
           getProducts({ limit: 8 }),
         ]);
+        const orders = await getOrders();
+        console.log("orders", orders);
 
         if (bannerRes.data?.success && bannerRes.data.data) {
           setBanners(bannerRes.data.data);

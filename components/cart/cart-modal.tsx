@@ -23,7 +23,7 @@ export default function CartAddedModal({
 
   React.useEffect(() => {
     // Slide up when visible
-    if (visible) translateY.value = withTiming(0, { duration: 300 });
+    if (visible) translateY.value = withTiming(1, { duration: 300 });
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({
